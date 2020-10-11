@@ -1,0 +1,42 @@
+#
+# Docker NodeJS Typescript Starter
+# Example Docker Compose file
+#
+
+# For more information about the directives defined here:
+# https://docs.docker.com/compose/compose-file/
+
+# Docker compose file version
+version: "3.7"
+
+services:
+  # Web App #
+  web:
+    image: web:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    command: npm run dev
+
+  # DB
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: "bookdb"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+    env_file:
+      - .env
+    volumes:
+      - ./setup.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./pdata:/var/lib/postgresql
